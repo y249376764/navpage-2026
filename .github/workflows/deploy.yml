@@ -1,0 +1,28 @@
+name: Deploy to Surge
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */6 * * *'   # 每6小时自动重新部署一次（保证新鲜）
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Surge
+        run: npm install -g surge
+
+      - name: Deploy to Surge
+        env:
+          SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
+        run: surge ./ navpage-2026.surge.sh --token $SURGE_TOKEN
